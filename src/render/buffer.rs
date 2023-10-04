@@ -40,19 +40,6 @@ impl QuadBufferBuilder {
         }
     }
 
-    pub fn push_ball(self, ball: &state::Ball) -> Self {
-        if ball.visible {
-            let min_x = ball.position.x - ball.radius;
-            let min_y = ball.position.y - ball.radius;
-            let max_x = ball.position.x + ball.radius;
-            let max_y = ball.position.y + ball.radius;
-
-            self.push_quad(min_x, min_y, max_x, max_y)
-        } else {
-            self
-        }
-    }
-
     pub fn push_player(self, player: &state::Player) -> Self {
         if player.visible {
             self.push_quad(

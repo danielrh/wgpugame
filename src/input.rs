@@ -4,8 +4,12 @@ use winit::event::{ElementState, VirtualKeyCode};
 pub struct Input {
     pub p1_up_pressed: bool,
     pub p1_down_pressed: bool,
+    pub p1_left_pressed: bool,
+    pub p1_right_pressed: bool,
     pub p2_up_pressed: bool,
     pub p2_down_pressed: bool,
+    pub p2_left_pressed: bool,
+    pub p2_right_pressed: bool,
     pub enter_pressed: bool,
 }
 
@@ -21,12 +25,28 @@ impl Input {
                 self.p2_up_pressed = pressed;
                 true
             }
+            VirtualKeyCode::Left => {
+                self.p2_left_pressed = pressed;
+                true
+            }
+            VirtualKeyCode::Right => {
+                self.p2_right_pressed = pressed;
+                true
+            }
             VirtualKeyCode::Down => {
                 self.p2_down_pressed = pressed;
                 true
             }
             VirtualKeyCode::W => {
                 self.p1_up_pressed = pressed;
+                true
+            }
+            VirtualKeyCode::A => {
+                self.p1_left_pressed = pressed;
+                true
+            }
+            VirtualKeyCode::D => {
+                self.p1_right_pressed = pressed;
                 true
             }
             VirtualKeyCode::S => {

@@ -150,9 +150,8 @@ impl Render {
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
 
-        let num_indices = if state.ball.visible || state.player1.visible || state.player2.visible {
+        let num_indices = if state.player1.visible || state.player2.visible {
             let (stg_vertex, stg_index, num_indices) = QuadBufferBuilder::new()
-                .push_ball(&state.ball)
                 .push_player(&state.player1)
                 .push_player(&state.player2)
                 .build(&self.device);

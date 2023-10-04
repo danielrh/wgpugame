@@ -26,11 +26,9 @@ impl System for VisibilitySystem {
 
         let is_in_game = any!(
             gs,
-            GameState::Serving,
             GameState::Playing,
             GameState::GameOver
         );
-        state.ball.visible = is_in_game && gs != GameState::GameOver;
         state.player1.visible = is_in_game;
         state.player1_score.visible = is_in_game;
         state.player2.visible = is_in_game;
@@ -78,7 +76,7 @@ impl System for MenuSystem {
         if state.play_button.focused && input.enter_pressed {
             log::info!("Starting game");
             events.push(state::Event::ButtonPressed);
-            state.game_state = state::GameState::Serving;
+            state.game_state = state::GameState::Playing;
             log::info!("Quitting");
         } else if state.quit_button.focused && input.enter_pressed {
             events.push(state::Event::ButtonPressed);
@@ -109,6 +107,19 @@ impl System for PlaySystem {
             state.player2.position.y -= util::PLAYER_SPEED;
         }
 
+        if input.p1_right_pressed {
+            state.player1.position.x += util::PLAYER_SPEED;
+        }
+        if input.p1_left_pressed {
+            state.player1.position.x -= util::PLAYER_SPEED;
+        }
+        if input.p2_right_pressed {
+            state.player2.position.x += util::PLAYER_SPEED;
+        }
+        if input.p2_left_pressed {
+            state.player2.position.x -= util::PLAYER_SPEED;
+        }
+
         // normalize players
         if state.player1.position.y > 1.0 - state.player1.size.y * 0.5 {
             state.player1.position.y = 1.0 - state.player1.size.y * 0.5;
@@ -124,89 +135,6 @@ impl System for PlaySystem {
         if state.player1.score > 2 || state.player2.score > 2 {
             log::info!("Gameover");
             state.game_state = state::GameState::GameOver;
-        }
-    }
-}
-
-pub struct BallSystem;
-
-impl System for BallSystem {
-    fn update_state(
-        &self,
-        _input: &input::Input,
-        state: &mut state::State,
-        events: &mut Vec<state::Event>,
-    ) {
-        // bounce the ball off the players
-        if state.player1.contains(&state.ball) {
-            events.push(state::Event::BallBounce(state.ball.position));
-            state.ball.position.x -= state.ball.velocity.x - state.player1.size.x;
-            state.ball.velocity = util::calc_ball_velocity(&state.ball, &state.player1);
-        } else if state.player2.contains(&state.ball) {
-            events.push(state::Event::BallBounce(state.ball.position));
-            state.ball.position.x -= state.ball.velocity.x + state.player2.size.x;
-            state.ball.velocity.x *= -state.player2.size.y;
-            state.ball.velocity = util::calc_ball_velocity(&state.ball, &state.player2);
-        }
-
-        state.ball.position += state.ball.velocity;
-        if state.ball.position.y > 1.0 {
-            events.push(state::Event::BallBounce(state.ball.position));
-            state.ball.position.y = 1.0;
-            state.ball.velocity.y *= -1.0;
-        } else if state.ball.position.y < -1.0 {
-            events.push(state::Event::BallBounce(state.ball.position));
-            state.ball.position.y = -1.0;
-            state.ball.velocity.y *= -1.0;
-        }
-
-        if state.ball.position.x > 1.0 {
-            log::info!("Player 1 scored");
-            state.player1.score += 1;
-            state.game_state = state::GameState::Serving;
-            events.push(state::Event::Score(0));
-        } else if state.ball.position.x < -1.0 {
-            log::info!("Player 1 scored");
-            state.player2.score += 1;
-            state.game_state = state::GameState::Serving;
-            events.push(state::Event::Score(1));
-        }
-    }
-}
-
-pub struct ServingSystem {
-    last_time: instant::Instant,
-}
-
-impl ServingSystem {
-    pub fn new() -> Self {
-        Self {
-            last_time: instant::Instant::now(),
-        }
-    }
-}
-
-impl System for ServingSystem {
-    fn start(&mut self, state: &mut state::State) {
-        self.last_time = instant::Instant::now();
-        let direction = state.ball.position.x.signum();
-        state.ball.position = (0.0, 0.0).into();
-        state.ball.velocity = cgmath::Vector2::unit_x() * direction * -util::BALL_SPEED;
-        state.player1_score.text = format!("{}", state.player1.score);
-        state.player2_score.text = format!("{}", state.player2.score);
-    }
-
-    fn update_state(
-        &self,
-        _input: &input::Input,
-        state: &mut state::State,
-        _events: &mut Vec<state::Event>,
-    ) {
-        let current_time = instant::Instant::now();
-        let delta_time = current_time - self.last_time;
-        if delta_time.as_secs_f32() > 2.0 {
-            log::info!("Serving...");
-            state.game_state = state::GameState::Playing;
         }
     }
 }

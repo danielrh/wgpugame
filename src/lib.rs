@@ -75,12 +75,6 @@ pub fn start() {
 
     let mut render = pollster::block_on(render::Render::new(&window, size));
     let mut state = state::State {
-        ball: state::Ball {
-            position: (0.0, 0.0).into(),
-            velocity: (0.0, 0.0).into(),
-            radius: 0.05,
-            visible: true,
-        },
         player1: state::Player {
             position: (-0.8, 0.0).into(),
             size: (0.05, 0.4).into(),
@@ -149,9 +143,7 @@ pub fn start() {
     log::info!("Initializing Systems...");
 
     let mut menu_system = system::MenuSystem;
-    let mut serving_system = system::ServingSystem::new();
     let mut play_system = system::PlaySystem;
-    let ball_system = system::BallSystem;
     let mut game_over_system = system::GameOverSystem::new();
 
     let mut visiblity_system = system::VisibilitySystem;
@@ -217,9 +209,6 @@ pub fn start() {
                         state::Event::FocusChanged | state::Event::ButtonPressed => {
                             sound_system.queue(sound_pack.bounce());
                         }
-                        state::Event::BallBounce(_pos) => {
-                            sound_system.queue(sound_pack.bounce());
-                        }
                         state::Event::Score(_) => {
                             sound_system.queue(sound_pack.bounce());
                         }
@@ -237,23 +226,13 @@ pub fn start() {
                 match state.game_state {
                     state::GameState::MainMenu => {
                         menu_system.update_state(&input, &mut state, &mut events);
-                        if state.game_state == state::GameState::Serving {
-                            serving_system.start(&mut state);
-                        }
-                    }
-                    state::GameState::Serving => {
-                        serving_system.update_state(&input, &mut state, &mut events);
-                        play_system.update_state(&input, &mut state, &mut events);
                         if state.game_state == state::GameState::Playing {
                             play_system.start(&mut state);
                         }
                     }
                     state::GameState::Playing => {
-                        ball_system.update_state(&input, &mut state, &mut events);
                         play_system.update_state(&input, &mut state, &mut events);
-                        if state.game_state == state::GameState::Serving {
-                            serving_system.start(&mut state);
-                        } else if state.game_state == state::GameState::GameOver {
+                        if state.game_state == state::GameState::GameOver {
                             game_over_system.start(&mut state);
                         }
                     }
