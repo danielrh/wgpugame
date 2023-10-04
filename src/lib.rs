@@ -4,20 +4,24 @@ mod sound;
 mod state;
 mod system;
 mod util;
+mod xset;
 
 use input::Input;
 use system::System;
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+use xset::Xset;
 
 use winit::dpi::PhysicalSize;
 use winit::event::*;
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::{Fullscreen, WindowBuilder};
 
+
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
 pub fn start() {
+    Xset::init();
     cfg_if::cfg_if! {
         if #[cfg(target_arch = "wasm32")] {
             console_log::init_with_level(log::Level::Warn).expect("Could't initialize logger");
@@ -187,7 +191,10 @@ pub fn start() {
                 ..
             } => {
                 let input_handled = match state.game_state {
-                    state::GameState::Quiting => true,
+                    state::GameState::Quiting => {
+                        Xset::deinit();
+                        true
+                    },
                     _ => input.update(key, element_state),
                 };
                 if !input_handled {
@@ -256,12 +263,16 @@ pub fn start() {
                             menu_system.start(&mut state);
                         }
                     }
-                    state::GameState::Quiting => {}
+                    state::GameState::Quiting => {
+                        Xset::deinit();
+                    }
                 }
 
                 render.render_state(&state);
                 if state.game_state != state::GameState::Quiting {
                     window.request_redraw();
+                } else {
+                    Xset::deinit();
                 }
             }
             _ => {}
@@ -276,6 +287,7 @@ fn process_input(
 ) {
     match (keycode, element_state) {
         (VirtualKeyCode::Escape, ElementState::Pressed) => {
+            Xset::deinit();
             *control_flow = ControlFlow::Exit;
         }
         _ => {}
