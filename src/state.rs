@@ -29,6 +29,7 @@ impl Default for Text {
 pub enum Event {
     ButtonPressed,
     FocusChanged,
+    #[allow(dead_code)]
     Score(u32),
     Resize(f32, f32),
 }

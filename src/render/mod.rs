@@ -185,17 +185,17 @@ impl Render {
 
                 drop(render_pass);
 
-                if state.title_text.visible {
-                    draw_text(&state.title_text, &mut self.glyph_brush);
+                if state.menu.title_text.visible {
+                    draw_text(&state.menu.title_text, &mut self.glyph_brush);
                 }
-                if state.play_button.visible {
-                    draw_text(&state.play_button, &mut self.glyph_brush);
+                if state.menu.play_button.visible {
+                    draw_text(&state.menu.play_button, &mut self.glyph_brush);
                 }
-                if state.quit_button.visible {
-                    draw_text(&state.quit_button, &mut self.glyph_brush);
+                if state.menu.quit_button.visible {
+                    draw_text(&state.menu.quit_button, &mut self.glyph_brush);
                 }
-                if state.win_text.visible {
-                    draw_text(&state.win_text, &mut self.glyph_brush);
+                if state.menu.win_text.visible {
+                    draw_text(&state.menu.win_text, &mut self.glyph_brush);
                 }
 
                 self.glyph_brush

@@ -1,3 +1,4 @@
+use super::menu::Menu;
 use super::render::Render;
 use super::state::Text;
 use super::system::System;
@@ -11,16 +12,14 @@ pub enum GameState {
     GameOver,
     Quiting,
 }
+
 pub struct State {
     pub player1: Player,
     pub player2: Player,
-    pub title_text: Text,
-    pub play_button: Text,
-    pub quit_button: Text,
     pub player1_score: Text,
     pub player2_score: Text,
-    pub win_text: Text,
     pub game_state: GameState,
+    pub menu: Menu,
 }
 
 impl State {
@@ -38,28 +37,6 @@ impl State {
                 score: 0,
                 visible: true,
             },
-            title_text: Text {
-                position: (20.0, 20.0).into(),
-                color: (1.0, 1.0, 1.0, 1.0).into(),
-                text: String::from("PONG"),
-                size: 64.0,
-                ..Default::default()
-            },
-            play_button: Text {
-                position: (40.0, 100.0).into(),
-                color: (1.0, 1.0, 1.0, 1.0).into(),
-                text: String::from("Play"),
-                size: 32.0,
-                centered: false,
-                ..Default::default()
-            },
-            quit_button: Text {
-                position: (40.0, 160.0).into(),
-                color: (1.0, 1.0, 1.0, 1.0).into(),
-                text: String::from("Quit"),
-                size: 32.0,
-                ..Default::default()
-            },
             player1_score: Text {
                 position: (render.width() * 0.25, 20.0).into(),
                 color: (1.0, 1.0, 1.0, 1.0).into(),
@@ -74,14 +51,8 @@ impl State {
                 size: 32.0,
                 ..Default::default()
             },
-            win_text: Text {
-                position: (render.width() * 0.5, render.height() * 0.5).into(),
-                bounds: (render.width(), UNBOUNDED_F32).into(),
-                size: 32.0,
-                centered: true,
-                ..Default::default()
-            },
             game_state: GameState::MainMenu,
+            menu: Menu::default(),
         }
     }
     pub fn draw(&self, glyph_brush: &mut wgpu_glyph::GlyphBrush<()>) -> QuadBufferBuilder {
@@ -94,6 +65,11 @@ impl State {
         QuadBufferBuilder::new()
             .push_quad2d(self.player1.position, self.player1.size)
             .push_quad2d(self.player2.position, self.player2.size)
+    }
+
+    pub fn resize(&mut self, width: f32, _height: f32) {
+        self.player1_score.position = (width * 0.25, 20.0).into();
+        self.player2_score.position = (width * 0.75, 20.0).into()
     }
 }
 

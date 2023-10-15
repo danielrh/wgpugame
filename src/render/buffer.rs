@@ -1,4 +1,3 @@
-use crate::state;
 use crate::util::size_of_slice;
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
 

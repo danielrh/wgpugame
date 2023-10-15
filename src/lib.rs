@@ -1,5 +1,6 @@
 pub mod game;
 mod input;
+pub mod menu;
 mod render;
 mod sound;
 mod state;
@@ -157,9 +158,8 @@ pub fn start() {
                         }
                         state::Event::Resize(width, height) => {
                             // TODO: there should be a system that handles this
-                            state.player1_score.position = (width * 0.25, 20.0).into();
-                            state.player2_score.position = (width * 0.75, 20.0).into();
-                            state.win_text.position = (width * 0.5, height * 0.5).into();
+                            state.resize(*width, *height);
+                            state.menu.win_text.position = (width * 0.5, height * 0.5).into();
                         }
                     }
                 }
