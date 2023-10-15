@@ -134,7 +134,6 @@ impl System for PlaySystem {
         state.player1.score += 1;
         state.player1.score %= 3;
 
-
         // Copy current score to players
         state.player1_score.text = state.player1.score.to_string();
         state.player2_score.text = state.player2.score.to_string();

@@ -41,7 +41,7 @@ pub fn start() {
     let window = WindowBuilder::new()
         .with_visible(false)
         .with_title("Pong")
-        .with_fullscreen(video_mode.map(|vm| Fullscreen::Exclusive(vm)))
+        //        .with_fullscreen(video_mode.map(|vm| Fullscreen::Exclusive(vm)))
         .build(&event_loop)
         .unwrap();
 
@@ -107,11 +107,63 @@ pub fn start() {
         };
 
         match event {
+            Event::DeviceEvent {
+                event: DeviceEvent::MouseMotion { delta: (x, y) },
+                ..
+            } => {
+                input.mouse_move_x = x;
+                input.mouse_move_y = y;
+            }
+            Event::WindowEvent {
+                event:
+                    WindowEvent::CursorMoved {
+                        position: position, ..
+                    },
+                ..
+            } => {
+                input.mouse_x = position.x;
+                input.mouse_y = position.y;
+            }
             Event::WindowEvent {
                 event: WindowEvent::CloseRequested,
                 ..
             } => {
                 state.game_state = game::GameState::Quiting;
+            }
+            Event::WindowEvent {
+                event:
+                    WindowEvent::MouseInput {
+                        state: element_state,
+                        button: button,
+                        ..
+                    },
+                ..
+            } => {
+                let mut index: usize;
+                match button {
+                    MouseButton::Left => {
+                        index = 0;
+                    }
+                    MouseButton::Right => {
+                        index = 1;
+                    }
+                    MouseButton::Middle => {
+                        index = 2;
+                    }
+                    MouseButton::Other(which) => {
+                        if (which as usize) < input.mouse_pressed.len() {
+                            index = which as usize;
+                        } else {
+                            index = 1;
+                        }
+                    }
+                }
+                if input.mouse_pressed[index] && element_state != ElementState::Pressed {
+                    input.mouse_click[index] = true;
+                } else {
+                    input.mouse_click[index] = false;
+                }
+                input.mouse_pressed[index] = element_state == ElementState::Pressed;
             }
             Event::WindowEvent {
                 event:

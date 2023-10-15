@@ -11,6 +11,12 @@ pub struct Input {
     pub p2_left_pressed: bool,
     pub p2_right_pressed: bool,
     pub enter_pressed: bool,
+    pub mouse_pressed: [bool; 16],
+    pub mouse_click: [bool; 16],
+    pub mouse_x: f64,
+    pub mouse_y: f64,
+    pub mouse_move_x: f64,
+    pub mouse_move_y: f64,
 }
 
 impl Input {
