@@ -1,7 +1,7 @@
 use crate::any;
+use crate::game::{self, GameState};
 use crate::input;
 use crate::state;
-use crate::game::{self, GameState};
 use crate::util;
 
 pub trait System {
@@ -25,11 +25,7 @@ impl System for VisibilitySystem {
     ) {
         let gs = state.game_state;
 
-        let is_in_game = any!(
-            gs,
-            GameState::Playing,
-            GameState::GameOver
-        );
+        let is_in_game = any!(gs, GameState::Playing, GameState::GameOver);
         state.player1.visible = is_in_game;
         state.player1_score.visible = is_in_game;
         state.player2.visible = is_in_game;

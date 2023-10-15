@@ -1,4 +1,3 @@
-
 #[derive(Debug)]
 pub struct Text {
     pub position: cgmath::Vector2<f32>,

@@ -8,14 +8,11 @@ pub struct Xset {
 impl Xset {
     pub fn new() -> Xset {
         Xset {
-            _res: std::io::Error::new(std::io::ErrorKind::Unsupported,
-                                     "No xset in wasm"),
+            _res: std::io::Error::new(std::io::ErrorKind::Unsupported, "No xset in wasm"),
         }
     }
-    pub fn init() {
-    }
-    pub fn deinit() {
-    }
+    pub fn init() {}
+    pub fn deinit() {}
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -26,7 +23,7 @@ impl Xset {
         }
     }
     pub fn init() {
-        XSET.get_or_init(||Xset::new());
+        XSET.get_or_init(|| Xset::new());
     }
     pub fn deinit() {
         let _ = Command::new("/usr/bin/xset").arg("r").arg("on").spawn();
