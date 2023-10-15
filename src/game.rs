@@ -2,7 +2,7 @@ use super::menu::Menu;
 use super::render::Render;
 use super::state::Text;
 use super::system::System;
-use crate::render::{draw_text, QuadBufferBuilder, Color};
+use crate::render::{draw_text, Color, QuadBufferBuilder};
 pub const UNBOUNDED_F32: f32 = std::f32::INFINITY;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -63,8 +63,16 @@ impl State {
             draw_text(&self.player2_score, glyph_brush);
         }
         QuadBufferBuilder::new()
-            .push_quad2d(self.player1.position, self.player1.size, Color::new(255,255,0))
-            .push_quad2d(self.player2.position, self.player2.size, Color::new(0,255,255))
+            .push_quad2d(
+                self.player1.position,
+                self.player1.size,
+                Color::new(255, 255, 0),
+            )
+            .push_quad2d(
+                self.player2.position,
+                self.player2.size,
+                Color::new(0, 255, 255),
+            )
     }
 
     pub fn resize(&mut self, width: f32, _height: f32) {
@@ -82,7 +90,6 @@ pub struct Player {
     pub score: u32,
     pub visible: bool,
 }
-
 
 pub struct PlaySystem;
 impl System for PlaySystem {

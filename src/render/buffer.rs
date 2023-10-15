@@ -14,15 +14,12 @@ pub struct Vertex {
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct Color {
-    color:cgmath::Vector4<f32>,
+    color: cgmath::Vector4<f32>,
 }
 impl Color {
     pub fn new(r: u8, g: u8, b: u8) -> Color {
         Color {
-            color: (r as f32/255.0,
-                    g as f32/255.0,
-                    b as f32/255.0,
-                    1.0).into()
+            color: (r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0, 1.0).into(),
         }
     }
     pub fn to_vec4(&self) -> cgmath::Vector4<f32> {
@@ -48,7 +45,6 @@ impl Vertex {
 pub struct QuadBufferBuilder {
     vertex_data: Vec<Vertex>,
     index_data: Vec<u32>,
-    current_quad: u32,
 }
 
 impl QuadBufferBuilder {
@@ -56,7 +52,6 @@ impl QuadBufferBuilder {
         Self {
             vertex_data: Vec::new(),
             index_data: Vec::new(),
-            current_quad: 0,
         }
     }
 
@@ -72,9 +67,11 @@ impl QuadBufferBuilder {
             self
         }
     }
-    pub fn push_quad2d(mut self, center: cgmath::Vector2<f32>,
-                       size: cgmath::Vector2<f32>,
-                       color: Color,
+    pub fn push_quad2d(
+        mut self,
+        center: cgmath::Vector2<f32>,
+        size: cgmath::Vector2<f32>,
+        color: Color,
     ) -> Self {
         let min_x = center.x - size.x * 0.5;
         let min_y = center.y - size.y * 0.5;
@@ -99,15 +96,42 @@ impl QuadBufferBuilder {
                 color,
             },
         ]);
+        let vertex_len = self.vertex_data.len() as u32;
         self.index_data.extend(&[
-            self.current_quad * 4 + 0,
-            self.current_quad * 4 + 1,
-            self.current_quad * 4 + 2,
-            self.current_quad * 4 + 0,
-            self.current_quad * 4 + 2,
-            self.current_quad * 4 + 3,
+            vertex_len - 4,
+            vertex_len - 3,
+            vertex_len - 2,
+            vertex_len - 4,
+            vertex_len - 2,
+            vertex_len - 1,
         ]);
-        self.current_quad += 1;
+        self
+    }
+
+    pub fn push_tri2d(
+        mut self,
+        a: cgmath::Vector2<f32>,
+        b: cgmath::Vector2<f32>,
+        c: cgmath::Vector2<f32>,
+        color: Color,
+    ) -> Self {
+        self.vertex_data.extend(&[
+            Vertex {
+                position: (a.x, a.y, 0.0, 1.0).into(),
+                color,
+            },
+            Vertex {
+                position: (b.x, b.y, 0.0, 1.0).into(),
+                color,
+            },
+            Vertex {
+                position: (c.x, c.y, 0.0, 1.0).into(),
+                color,
+            },
+        ]);
+        let vertex_len = self.vertex_data.len() as u32;
+        self.index_data
+            .extend(&[vertex_len - 3, vertex_len - 2, vertex_len - 1]);
         self
     }
 
@@ -130,15 +154,15 @@ impl QuadBufferBuilder {
                 color: Color::new(255, 255, 255),
             },
         ]);
+        let vertex_len = self.vertex_data.len() as u32;
         self.index_data.extend(&[
-            self.current_quad * 4 + 0,
-            self.current_quad * 4 + 1,
-            self.current_quad * 4 + 2,
-            self.current_quad * 4 + 0,
-            self.current_quad * 4 + 2,
-            self.current_quad * 4 + 3,
+            vertex_len - 4,
+            vertex_len - 3,
+            vertex_len - 2,
+            vertex_len - 4,
+            vertex_len - 2,
+            vertex_len - 1,
         ]);
-        self.current_quad += 1;
         self
     }
 

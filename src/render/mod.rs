@@ -6,8 +6,8 @@ use wgpu_glyph::{ab_glyph, Section, Text};
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
 
-pub use buffer::{QuadBufferBuilder, Color};
 use buffer::*;
+pub use buffer::{Color, QuadBufferBuilder};
 
 use crate::state;
 
@@ -231,20 +231,21 @@ pub fn draw_text(text: &state::Text, glyph_brush: &mut wgpu_glyph::GlyphBrush<()
         wgpu_glyph::HorizontalAlign::Left
     });
 
-    let section =
-        Section {
-            screen_position: text.position.into(),
-            bounds: text.bounds.into(),
-            layout,
-            ..Section::default()
-        }
-        .add_text(Text::new(&text.text).with_color(text.color.to_vec4()).with_scale(
-            if text.focused {
+    let section = Section {
+        screen_position: text.position.into(),
+        bounds: text.bounds.into(),
+        layout,
+        ..Section::default()
+    }
+    .add_text(
+        Text::new(&text.text)
+            .with_color(text.color.to_vec4())
+            .with_scale(if text.focused {
                 text.size + 8.0
             } else {
                 text.size
-            },
-        ));
+            }),
+    );
 
     glyph_brush.queue(section);
 }

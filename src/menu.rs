@@ -1,6 +1,6 @@
 use super::game::UNBOUNDED_F32;
-use super::state::Text;
 use super::render::Color;
+use super::state::Text;
 pub struct Menu {
     pub title_text: Text,
     pub play_button: Text,
