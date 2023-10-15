@@ -1,11 +1,12 @@
 #version 450
 
-layout(location=0) in vec2 aPosition;
-// layout(location=1) in vec2 aTexCoord;
+layout(location=0) in vec4 aPosition;
+layout(location=1) in vec4 aColor;
 
-// layout(location=0) out vec2 vTexCoord;
+layout(location=0) out vec4 vColor;
 
 void main() {
-    gl_Position = vec4(aPosition, 0, 1);
+    gl_Position = aPosition;
+    vColor = aColor;
     // vTexCoord = aTexCoord;
 }

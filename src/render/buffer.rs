@@ -8,7 +8,8 @@ pub const U32_SIZE: wgpu::BufferAddress = std::mem::size_of::<u32>() as wgpu::Bu
 #[repr(C)]
 pub struct Vertex {
     #[allow(dead_code)]
-    position: cgmath::Vector2<f32>,
+    position: cgmath::Vector4<f32>,
+    color: cgmath::Vector4<f32>,
 }
 
 unsafe impl bytemuck::Pod for Vertex {}
@@ -20,7 +21,8 @@ impl Vertex {
         array_stride: Self::SIZE,
         step_mode: wgpu::VertexStepMode::Vertex,
         attributes: &wgpu::vertex_attr_array![
-            0 => Float32x2
+            0 => Float32x4,
+            1 => Float32x4,
         ],
     };
 }
@@ -56,16 +58,20 @@ impl QuadBufferBuilder {
     pub fn push_quad(mut self, min_x: f32, min_y: f32, max_x: f32, max_y: f32) -> Self {
         self.vertex_data.extend(&[
             Vertex {
-                position: (min_x, min_y).into(),
+                position: (min_x, min_y, 0.0, 1.0).into(),
+                color: (1.0, 1.0, 1.0, 1.0).into(),
             },
             Vertex {
-                position: (max_x, min_y).into(),
+                position: (max_x, min_y, 0.0, 1.0).into(),
+                color: (1.0, 0.0, 0.0, 1.0).into(),
             },
             Vertex {
-                position: (max_x, max_y).into(),
+                position: (max_x, max_y, 0.0, 1.0).into(),
+                color: (0.0, 0.0, 1.0, 1.0).into(),
             },
             Vertex {
-                position: (min_x, max_y).into(),
+                position: (min_x, max_y, 0.0, 1.0).into(),
+                color: (0.0, 1.0, 0.0, 1.0).into(),
             },
         ]);
         self.index_data.extend(&[
