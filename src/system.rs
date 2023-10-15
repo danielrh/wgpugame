@@ -1,15 +1,16 @@
 use crate::any;
 use crate::input;
-use crate::state::{self, GameState};
+use crate::state;
+use crate::game::{self, GameState};
 use crate::util;
 
 pub trait System {
     #[allow(unused_variables)]
-    fn start(&mut self, state: &mut state::State) {}
+    fn start(&mut self, state: &mut game::State) {}
     fn update_state(
         &self,
         input: &input::Input,
-        state: &mut state::State,
+        state: &mut game::State,
         events: &mut Vec<state::Event>,
     );
 }
@@ -19,7 +20,7 @@ impl System for VisibilitySystem {
     fn update_state(
         &self,
         _input: &input::Input,
-        state: &mut state::State,
+        state: &mut game::State,
         _events: &mut Vec<state::Event>,
     ) {
         let gs = state.game_state;
@@ -46,7 +47,7 @@ impl System for VisibilitySystem {
 pub struct MenuSystem;
 
 impl System for MenuSystem {
-    fn start(&mut self, state: &mut state::State) {
+    fn start(&mut self, state: &mut game::State) {
         state.player1.score = 0;
         state.player2.score = 0;
         state.player1.position.y = 0.0;
@@ -58,7 +59,7 @@ impl System for MenuSystem {
     fn update_state(
         &self,
         input: &input::Input,
-        state: &mut state::State,
+        state: &mut game::State,
         events: &mut Vec<state::Event>,
     ) {
         if state.play_button.focused && input.ui_down_pressed() {
@@ -76,11 +77,11 @@ impl System for MenuSystem {
         if state.play_button.focused && input.enter_pressed {
             log::info!("Starting game");
             events.push(state::Event::ButtonPressed);
-            state.game_state = state::GameState::Playing;
+            state.game_state = game::GameState::Playing;
             log::info!("Quitting");
         } else if state.quit_button.focused && input.enter_pressed {
             events.push(state::Event::ButtonPressed);
-            state.game_state = state::GameState::Quiting;
+            state.game_state = game::GameState::Quiting;
         }
     }
 }
@@ -90,7 +91,7 @@ impl System for PlaySystem {
     fn update_state(
         &self,
         input: &input::Input,
-        state: &mut state::State,
+        state: &mut game::State,
         _events: &mut Vec<state::Event>,
     ) {
         // move the players
@@ -134,7 +135,7 @@ impl System for PlaySystem {
 
         if state.player1.score > 2 || state.player2.score > 2 {
             log::info!("Gameover");
-            state.game_state = state::GameState::GameOver;
+            state.game_state = game::GameState::GameOver;
         }
     }
 }
@@ -152,7 +153,7 @@ impl GameOverSystem {
 }
 
 impl System for GameOverSystem {
-    fn start(&mut self, state: &mut state::State) {
+    fn start(&mut self, state: &mut game::State) {
         self.last_time = instant::Instant::now();
 
         state.player1_score.text = format!("{}", state.player1.score);
@@ -170,13 +171,13 @@ impl System for GameOverSystem {
     fn update_state(
         &self,
         _input: &input::Input,
-        state: &mut state::State,
+        state: &mut game::State,
         _events: &mut Vec<state::Event>,
     ) {
         let current_time = instant::Instant::now();
         let delta_time = current_time - self.last_time;
         if delta_time.as_secs_f32() > 1.0 {
-            state.game_state = state::GameState::MainMenu;
+            state.game_state = game::GameState::MainMenu;
         }
     }
 }

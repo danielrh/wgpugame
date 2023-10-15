@@ -5,6 +5,7 @@ mod state;
 mod system;
 mod util;
 mod xset;
+pub mod game;
 
 use input::Input;
 use system::System;
@@ -74,64 +75,7 @@ pub fn start() {
     log::info!("Setup...");
 
     let mut render = pollster::block_on(render::Render::new(&window, size));
-    let mut state = state::State {
-        player1: state::Player {
-            position: (-0.8, 0.0).into(),
-            size: (0.05, 0.4).into(),
-            score: 0,
-            visible: true,
-        },
-        player2: state::Player {
-            position: (0.8, 0.0).into(),
-            size: (0.05, 0.4).into(),
-            score: 0,
-            visible: true,
-        },
-        title_text: state::Text {
-            position: (20.0, 20.0).into(),
-            color: (1.0, 1.0, 1.0, 1.0).into(),
-            text: String::from("PONG"),
-            size: 64.0,
-            ..Default::default()
-        },
-        play_button: state::Text {
-            position: (40.0, 100.0).into(),
-            color: (1.0, 1.0, 1.0, 1.0).into(),
-            text: String::from("Play"),
-            size: 32.0,
-            centered: false,
-            ..Default::default()
-        },
-        quit_button: state::Text {
-            position: (40.0, 160.0).into(),
-            color: (1.0, 1.0, 1.0, 1.0).into(),
-            text: String::from("Quit"),
-            size: 32.0,
-            ..Default::default()
-        },
-        player1_score: state::Text {
-            position: (render.width() * 0.25, 20.0).into(),
-            color: (1.0, 1.0, 1.0, 1.0).into(),
-            text: String::from("0"),
-            size: 32.0,
-            ..Default::default()
-        },
-        player2_score: state::Text {
-            position: (render.width() * 0.75, 20.0).into(),
-            color: (1.0, 1.0, 1.0, 1.0).into(),
-            text: String::from("0"),
-            size: 32.0,
-            ..Default::default()
-        },
-        win_text: state::Text {
-            position: (render.width() * 0.5, render.height() * 0.5).into(),
-            bounds: (render.width(), state::UNBOUNDED_F32).into(),
-            size: 32.0,
-            centered: true,
-            ..Default::default()
-        },
-        game_state: state::GameState::MainMenu,
-    };
+    let mut state = game::State::new(&render);
 
     log::info!("Sound...");
 
@@ -156,7 +100,7 @@ pub fn start() {
     log::info!("Event Loop...");
 
     event_loop.run(move |event, _, control_flow| {
-        *control_flow = if state.game_state == state::GameState::Quiting {
+        *control_flow = if state.game_state == game::GameState::Quiting {
             ControlFlow::Exit
         } else {
             ControlFlow::Poll
@@ -167,7 +111,7 @@ pub fn start() {
                 event: WindowEvent::CloseRequested,
                 ..
             } => {
-                state.game_state = state::GameState::Quiting;
+                state.game_state = game::GameState::Quiting;
             }
             Event::WindowEvent {
                 event:
@@ -183,7 +127,7 @@ pub fn start() {
                 ..
             } => {
                 let input_handled = match state.game_state {
-                    state::GameState::Quiting => {
+                    game::GameState::Quiting => {
                         Xset::deinit();
                         true
                     },
@@ -224,31 +168,31 @@ pub fn start() {
 
                 visiblity_system.update_state(&input, &mut state, &mut events);
                 match state.game_state {
-                    state::GameState::MainMenu => {
+                    game::GameState::MainMenu => {
                         menu_system.update_state(&input, &mut state, &mut events);
-                        if state.game_state == state::GameState::Playing {
+                        if state.game_state == game::GameState::Playing {
                             play_system.start(&mut state);
                         }
                     }
-                    state::GameState::Playing => {
+                    game::GameState::Playing => {
                         play_system.update_state(&input, &mut state, &mut events);
-                        if state.game_state == state::GameState::GameOver {
+                        if state.game_state == game::GameState::GameOver {
                             game_over_system.start(&mut state);
                         }
                     }
-                    state::GameState::GameOver => {
+                    game::GameState::GameOver => {
                         game_over_system.update_state(&input, &mut state, &mut events);
-                        if state.game_state == state::GameState::MainMenu {
+                        if state.game_state == game::GameState::MainMenu {
                             menu_system.start(&mut state);
                         }
                     }
-                    state::GameState::Quiting => {
+                    game::GameState::Quiting => {
                         Xset::deinit();
                     }
                 }
 
                 render.render_state(&state);
-                if state.game_state != state::GameState::Quiting {
+                if state.game_state != game::GameState::Quiting {
                     window.request_redraw();
                 } else {
                     Xset::deinit();

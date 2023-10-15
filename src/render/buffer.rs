@@ -40,7 +40,7 @@ impl QuadBufferBuilder {
         }
     }
 
-    pub fn push_player(self, player: &state::Player) -> Self {
+    pub fn push_player(self, player: &crate::game::Player) -> Self {
         if player.visible {
             self.push_quad(
                 player.position.x - player.size.x * 0.5,

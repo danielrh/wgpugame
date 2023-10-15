@@ -145,7 +145,7 @@ impl Render {
         self.surface.configure(&self.device, &self.config);
     }
 
-    pub fn render_state(&mut self, state: &state::State) {
+    pub fn render_state(&mut self, state: &crate::game::State) {
         let mut encoder = self
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
