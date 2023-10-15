@@ -118,7 +118,7 @@ impl System for PlaySystem {
             state.player2.position.x -= PLAYER_SPEED;
         }
 
-        // normalize players
+        // Never allow players to go past upper or lower edge of screen.
         if state.player1.position.y > 1.0 - state.player1.size.y * 0.5 {
             state.player1.position.y = 1.0 - state.player1.size.y * 0.5;
         } else if state.player1.position.y < state.player1.size.y * 0.5 - 1.0 {
@@ -130,13 +130,14 @@ impl System for PlaySystem {
             state.player2.position.y = state.player1.size.y * 0.5 - 1.0;
         }
 
-        // Copy current score to players
-        state.player1_score.text = state.player1.score.to_string();
-        state.player2_score.text = state.player2.score.to_string();
-
         // Silly: add score a bit and subtract it like GladOS
         state.player1.score += 1;
         state.player1.score %= 3;
+
+
+        // Copy current score to players
+        state.player1_score.text = state.player1.score.to_string();
+        state.player2_score.text = state.player2.score.to_string();
 
         if state.player1.score > 2 || state.player2.score > 2 {
             log::info!("Gameover");
