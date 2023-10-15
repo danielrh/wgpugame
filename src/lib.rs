@@ -87,7 +87,7 @@ pub fn start() {
     log::info!("Initializing Systems...");
 
     let mut menu_system = system::MenuSystem;
-    let mut play_system = system::PlaySystem;
+    let mut play_system = game::PlaySystem;
     let mut game_over_system = system::GameOverSystem::new();
 
     let mut visiblity_system = system::VisibilitySystem;

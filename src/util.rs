@@ -2,8 +2,6 @@
 
 use crate::state;
 
-pub const PLAYER_SPEED: f32 = 0.05;
-
 pub fn size_of_slice<T: Sized>(slice: &[T]) -> usize {
     std::mem::size_of::<T>() * slice.len()
 }

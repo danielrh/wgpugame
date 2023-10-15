@@ -86,60 +86,6 @@ impl System for MenuSystem {
     }
 }
 
-pub struct PlaySystem;
-impl System for PlaySystem {
-    fn update_state(
-        &self,
-        input: &input::Input,
-        state: &mut game::State,
-        _events: &mut Vec<state::Event>,
-    ) {
-        // move the players
-        if input.p1_up_pressed {
-            state.player1.position.y += util::PLAYER_SPEED;
-        }
-        if input.p1_down_pressed {
-            state.player1.position.y -= util::PLAYER_SPEED;
-        }
-        if input.p2_up_pressed {
-            state.player2.position.y += util::PLAYER_SPEED;
-        }
-        if input.p2_down_pressed {
-            state.player2.position.y -= util::PLAYER_SPEED;
-        }
-
-        if input.p1_right_pressed {
-            state.player1.position.x += util::PLAYER_SPEED;
-        }
-        if input.p1_left_pressed {
-            state.player1.position.x -= util::PLAYER_SPEED;
-        }
-        if input.p2_right_pressed {
-            state.player2.position.x += util::PLAYER_SPEED;
-        }
-        if input.p2_left_pressed {
-            state.player2.position.x -= util::PLAYER_SPEED;
-        }
-
-        // normalize players
-        if state.player1.position.y > 1.0 - state.player1.size.y * 0.5 {
-            state.player1.position.y = 1.0 - state.player1.size.y * 0.5;
-        } else if state.player1.position.y < state.player1.size.y * 0.5 - 1.0 {
-            state.player1.position.y = state.player1.size.y * 0.5 - 1.0;
-        }
-        if state.player2.position.y > 1.0 - state.player1.size.y * 0.5 {
-            state.player2.position.y = 1.0 - state.player1.size.y * 0.5;
-        } else if state.player2.position.y < state.player1.size.y * 0.5 - 1.0 {
-            state.player2.position.y = state.player1.size.y * 0.5 - 1.0;
-        }
-
-        if state.player1.score > 2 || state.player2.score > 2 {
-            log::info!("Gameover");
-            state.game_state = game::GameState::GameOver;
-        }
-    }
-}
-
 pub struct GameOverSystem {
     last_time: instant::Instant,
 }

@@ -1,5 +1,6 @@
 use super::state::Text;
 use super::render::Render;
+use super::system::System;
 pub const UNBOUNDED_F32: f32 = std::f32::INFINITY;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -83,6 +84,8 @@ impl State {
          }
     }
 }
+pub const PLAYER_SPEED: f32 = 0.05;
+
 
 
 #[derive(Debug)]
@@ -91,5 +94,59 @@ pub struct Player {
     pub size: cgmath::Vector2<f32>,
     pub score: u32,
     pub visible: bool,
+}
+
+pub struct PlaySystem;
+impl System for PlaySystem {
+    fn update_state(
+        &self,
+        input: &crate::input::Input,
+        state: &mut State,
+        _events: &mut Vec<crate::state::Event>,
+    ) {
+        // move the players
+        if input.p1_up_pressed {
+            state.player1.position.y += PLAYER_SPEED;
+        }
+        if input.p1_down_pressed {
+            state.player1.position.y -= PLAYER_SPEED;
+        }
+        if input.p2_up_pressed {
+            state.player2.position.y += PLAYER_SPEED;
+        }
+        if input.p2_down_pressed {
+            state.player2.position.y -= PLAYER_SPEED;
+        }
+
+        if input.p1_right_pressed {
+            state.player1.position.x += PLAYER_SPEED;
+        }
+        if input.p1_left_pressed {
+            state.player1.position.x -= PLAYER_SPEED;
+        }
+        if input.p2_right_pressed {
+            state.player2.position.x += PLAYER_SPEED;
+        }
+        if input.p2_left_pressed {
+            state.player2.position.x -= PLAYER_SPEED;
+        }
+
+        // normalize players
+        if state.player1.position.y > 1.0 - state.player1.size.y * 0.5 {
+            state.player1.position.y = 1.0 - state.player1.size.y * 0.5;
+        } else if state.player1.position.y < state.player1.size.y * 0.5 - 1.0 {
+            state.player1.position.y = state.player1.size.y * 0.5 - 1.0;
+        }
+        if state.player2.position.y > 1.0 - state.player1.size.y * 0.5 {
+            state.player2.position.y = 1.0 - state.player1.size.y * 0.5;
+        } else if state.player2.position.y < state.player1.size.y * 0.5 - 1.0 {
+            state.player2.position.y = state.player1.size.y * 0.5 - 1.0;
+        }
+
+        if state.player1.score > 2 || state.player2.score > 2 {
+            log::info!("Gameover");
+            state.game_state = GameState::GameOver;
+        }
+    }
 }
 
