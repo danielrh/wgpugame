@@ -6,6 +6,7 @@ use wgpu_glyph::{ab_glyph, Section, Text};
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
 
+pub use buffer::QuadBufferBuilder;
 use buffer::*;
 
 use crate::state;
@@ -151,10 +152,8 @@ impl Render {
             .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
 
         let num_indices = if state.player1.visible || state.player2.visible {
-            let (stg_vertex, stg_index, num_indices) = QuadBufferBuilder::new()
-                .push_player(&state.player1)
-                .push_player(&state.player2)
-                .build(&self.device);
+            let (stg_vertex, stg_index, num_indices) =
+                state.draw(&mut self.glyph_brush).build(&self.device);
 
             stg_vertex.copy_to_buffer(&mut encoder, &self.vertex_buffer);
             stg_index.copy_to_buffer(&mut encoder, &self.index_buffer);
@@ -195,12 +194,6 @@ impl Render {
                 if state.quit_button.visible {
                     draw_text(&state.quit_button, &mut self.glyph_brush);
                 }
-                if state.player1_score.visible {
-                    draw_text(&state.player1_score, &mut self.glyph_brush);
-                }
-                if state.player2_score.visible {
-                    draw_text(&state.player2_score, &mut self.glyph_brush);
-                }
                 if state.win_text.visible {
                     draw_text(&state.win_text, &mut self.glyph_brush);
                 }
@@ -231,7 +224,7 @@ impl Render {
     }
 }
 
-fn draw_text(text: &state::Text, glyph_brush: &mut wgpu_glyph::GlyphBrush<()>) {
+pub fn draw_text(text: &state::Text, glyph_brush: &mut wgpu_glyph::GlyphBrush<()>) {
     let layout = wgpu_glyph::Layout::default().h_align(if text.centered {
         wgpu_glyph::HorizontalAlign::Center
     } else {

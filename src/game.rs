@@ -1,6 +1,7 @@
 use super::render::Render;
 use super::state::Text;
 use super::system::System;
+use crate::render::{draw_text, QuadBufferBuilder};
 pub const UNBOUNDED_F32: f32 = std::f32::INFINITY;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -83,7 +84,19 @@ impl State {
             game_state: GameState::MainMenu,
         }
     }
+    pub fn draw(&self, glyph_brush: &mut wgpu_glyph::GlyphBrush<()>) -> QuadBufferBuilder {
+        if self.player1_score.visible {
+            draw_text(&self.player1_score, glyph_brush);
+        }
+        if self.player2_score.visible {
+            draw_text(&self.player2_score, glyph_brush);
+        }
+        QuadBufferBuilder::new()
+            .push_quad2d(self.player1.position, self.player1.size)
+            .push_quad2d(self.player2.position, self.player2.size)
+    }
 }
+
 pub const PLAYER_SPEED: f32 = 0.05;
 
 #[derive(Debug)]
@@ -140,6 +153,14 @@ impl System for PlaySystem {
         } else if state.player2.position.y < state.player1.size.y * 0.5 - 1.0 {
             state.player2.position.y = state.player1.size.y * 0.5 - 1.0;
         }
+
+        // Copy current score to players
+        state.player1_score.text = state.player1.score.to_string();
+        state.player2_score.text = state.player2.score.to_string();
+
+        // Silly: add score a bit and subtract it like GladOS
+        state.player1.score += 1;
+        state.player1.score %= 3;
 
         if state.player1.score > 2 || state.player2.score > 2 {
             log::info!("Gameover");

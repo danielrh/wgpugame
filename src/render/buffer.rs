@@ -54,6 +54,41 @@ impl QuadBufferBuilder {
             self
         }
     }
+    pub fn push_quad2d(mut self, center: cgmath::Vector2<f32>, size: cgmath::Vector2<f32>) -> Self {
+        let min_x = center.x - size.x * 0.5;
+        let min_y = center.y - size.y * 0.5;
+        let max_x = center.x + size.x * 0.5;
+        let max_y = center.y + size.y * 0.5;
+
+        self.vertex_data.extend(&[
+            Vertex {
+                position: (min_x, min_y, 0.0, 1.0).into(),
+                color: (1.0, 1.0, 1.0, 1.0).into(),
+            },
+            Vertex {
+                position: (max_x, min_y, 0.0, 1.0).into(),
+                color: (1.0, 0.0, 0.0, 1.0).into(),
+            },
+            Vertex {
+                position: (max_x, max_y, 0.0, 1.0).into(),
+                color: (0.0, 0.0, 1.0, 1.0).into(),
+            },
+            Vertex {
+                position: (min_x, max_y, 0.0, 1.0).into(),
+                color: (0.0, 1.0, 0.0, 1.0).into(),
+            },
+        ]);
+        self.index_data.extend(&[
+            self.current_quad * 4 + 0,
+            self.current_quad * 4 + 1,
+            self.current_quad * 4 + 2,
+            self.current_quad * 4 + 0,
+            self.current_quad * 4 + 2,
+            self.current_quad * 4 + 3,
+        ]);
+        self.current_quad += 1;
+        self
+    }
 
     pub fn push_quad(mut self, min_x: f32, min_y: f32, max_x: f32, max_y: f32) -> Self {
         self.vertex_data.extend(&[
