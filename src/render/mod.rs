@@ -6,7 +6,7 @@ use wgpu_glyph::{ab_glyph, Section, Text};
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
 
-pub use buffer::QuadBufferBuilder;
+pub use buffer::{QuadBufferBuilder, Color};
 use buffer::*;
 
 use crate::state;
@@ -238,7 +238,7 @@ pub fn draw_text(text: &state::Text, glyph_brush: &mut wgpu_glyph::GlyphBrush<()
             layout,
             ..Section::default()
         }
-        .add_text(Text::new(&text.text).with_color(text.color).with_scale(
+        .add_text(Text::new(&text.text).with_color(text.color.to_vec4()).with_scale(
             if text.focused {
                 text.size + 8.0
             } else {

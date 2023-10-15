@@ -8,7 +8,26 @@ pub const U32_SIZE: wgpu::BufferAddress = std::mem::size_of::<u32>() as wgpu::Bu
 pub struct Vertex {
     #[allow(dead_code)]
     position: cgmath::Vector4<f32>,
-    color: cgmath::Vector4<f32>,
+    color: Color,
+}
+
+#[derive(Copy, Clone, Debug)]
+#[repr(C)]
+pub struct Color {
+    color:cgmath::Vector4<f32>,
+}
+impl Color {
+    pub fn new(r: u8, g: u8, b: u8) -> Color {
+        Color {
+            color: (r as f32/255.0,
+                    g as f32/255.0,
+                    b as f32/255.0,
+                    1.0).into()
+        }
+    }
+    pub fn to_vec4(&self) -> cgmath::Vector4<f32> {
+        self.color
+    }
 }
 
 unsafe impl bytemuck::Pod for Vertex {}
@@ -53,7 +72,10 @@ impl QuadBufferBuilder {
             self
         }
     }
-    pub fn push_quad2d(mut self, center: cgmath::Vector2<f32>, size: cgmath::Vector2<f32>) -> Self {
+    pub fn push_quad2d(mut self, center: cgmath::Vector2<f32>,
+                       size: cgmath::Vector2<f32>,
+                       color: Color,
+    ) -> Self {
         let min_x = center.x - size.x * 0.5;
         let min_y = center.y - size.y * 0.5;
         let max_x = center.x + size.x * 0.5;
@@ -62,19 +84,19 @@ impl QuadBufferBuilder {
         self.vertex_data.extend(&[
             Vertex {
                 position: (min_x, min_y, 0.0, 1.0).into(),
-                color: (1.0, 1.0, 1.0, 1.0).into(),
+                color,
             },
             Vertex {
                 position: (max_x, min_y, 0.0, 1.0).into(),
-                color: (1.0, 0.0, 0.0, 1.0).into(),
+                color,
             },
             Vertex {
                 position: (max_x, max_y, 0.0, 1.0).into(),
-                color: (0.0, 0.0, 1.0, 1.0).into(),
+                color,
             },
             Vertex {
                 position: (min_x, max_y, 0.0, 1.0).into(),
-                color: (0.0, 1.0, 0.0, 1.0).into(),
+                color,
             },
         ]);
         self.index_data.extend(&[
@@ -93,19 +115,19 @@ impl QuadBufferBuilder {
         self.vertex_data.extend(&[
             Vertex {
                 position: (min_x, min_y, 0.0, 1.0).into(),
-                color: (1.0, 1.0, 1.0, 1.0).into(),
+                color: Color::new(255, 255, 255),
             },
             Vertex {
                 position: (max_x, min_y, 0.0, 1.0).into(),
-                color: (1.0, 0.0, 0.0, 1.0).into(),
+                color: Color::new(255, 255, 255),
             },
             Vertex {
                 position: (max_x, max_y, 0.0, 1.0).into(),
-                color: (0.0, 0.0, 1.0, 1.0).into(),
+                color: Color::new(255, 255, 255),
             },
             Vertex {
                 position: (min_x, max_y, 0.0, 1.0).into(),
-                color: (0.0, 1.0, 0.0, 1.0).into(),
+                color: Color::new(255, 255, 255),
             },
         ]);
         self.index_data.extend(&[

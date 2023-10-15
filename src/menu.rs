@@ -1,5 +1,6 @@
 use super::game::UNBOUNDED_F32;
 use super::state::Text;
+use super::render::Color;
 pub struct Menu {
     pub title_text: Text,
     pub play_button: Text,
@@ -11,14 +12,14 @@ impl Default for Menu {
         Menu {
             title_text: Text {
                 position: (20.0, 20.0).into(),
-                color: (1.0, 1.0, 1.0, 1.0).into(),
+                color: Color::new(255, 255, 255),
                 text: String::from("PONG"),
                 size: 64.0,
                 ..Default::default()
             },
             play_button: Text {
                 position: (40.0, 100.0).into(),
-                color: (1.0, 1.0, 1.0, 1.0).into(),
+                color: Color::new(255, 255, 255),
                 text: String::from("Play"),
                 size: 32.0,
                 centered: false,
@@ -26,13 +27,14 @@ impl Default for Menu {
             },
             quit_button: Text {
                 position: (40.0, 160.0).into(),
-                color: (1.0, 1.0, 1.0, 1.0).into(),
+                color: Color::new(255, 255, 255),
                 text: String::from("Quit"),
                 size: 32.0,
                 ..Default::default()
             },
             win_text: Text {
                 position: (160.0, 120.0).into(),
+                color: Color::new(255, 255, 255),
                 bounds: (320.0, UNBOUNDED_F32).into(),
                 size: 32.0,
                 centered: true,

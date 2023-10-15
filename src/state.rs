@@ -1,8 +1,9 @@
+use crate::render::Color;
 #[derive(Debug)]
 pub struct Text {
     pub position: cgmath::Vector2<f32>,
     pub bounds: cgmath::Vector2<f32>,
-    pub color: cgmath::Vector4<f32>,
+    pub color: Color,
     pub text: String,
     pub size: f32,
     pub visible: bool,
@@ -15,7 +16,7 @@ impl Default for Text {
         Self {
             position: (0.0, 0.0).into(),
             bounds: (super::game::UNBOUNDED_F32, super::game::UNBOUNDED_F32).into(),
-            color: (1.0, 1.0, 1.0, 1.0).into(),
+            color: Color::new(255, 255, 255),
             text: String::new(),
             size: 16.0,
             visible: false,
