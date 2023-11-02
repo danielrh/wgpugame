@@ -10,6 +10,8 @@ use buffer::*;
 pub use buffer::{Color, QuadBufferBuilder};
 
 use crate::state;
+const MAX_VERTICES :u64 = 1024 * 1024;
+const MAX_INDICES :u64 = 2048 * 1024;
 
 const FONT_BYTES: &[u8] = include_bytes!("../../res/fonts/PressStart2P-Regular.ttf");
 
@@ -109,14 +111,14 @@ impl Render {
 
         let vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             label: None,
-            size: Vertex::SIZE * 4 * 3,
+            size: Vertex::SIZE * MAX_VERTICES * 3,
             usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
 
         let index_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             label: None,
-            size: U32_SIZE * 6 * 3,
+            size: U32_SIZE * MAX_INDICES * 3,
             usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });

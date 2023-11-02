@@ -63,7 +63,7 @@ impl State {
             draw_text(&self.player2_score, glyph_brush);
         }
         QuadBufferBuilder::new()
-            .push_quad2d(
+            .push_elipse(
                 self.player1.position,
                 self.player1.size,
                 Color::new(255, 255, 0),
