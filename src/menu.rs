@@ -13,7 +13,7 @@ impl Default for Menu {
             title_text: Text {
                 position: (20.0, 20.0).into(),
                 color: Color::new(255, 255, 255),
-                text: String::from("PONG"),
+                text: String::from("CLICKER"),
                 size: 64.0,
                 ..Default::default()
             },

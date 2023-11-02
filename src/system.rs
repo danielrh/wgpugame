@@ -27,8 +27,6 @@ impl System for VisibilitySystem {
         let is_in_game = any!(gs, GameState::Playing, GameState::GameOver);
         state.player1.visible = is_in_game;
         state.player1_score.visible = is_in_game;
-        state.player2.visible = is_in_game;
-        state.player2_score.visible = is_in_game;
 
         state.menu.title_text.visible = gs == GameState::MainMenu;
         state.menu.play_button.visible = gs == GameState::MainMenu;
@@ -44,9 +42,9 @@ pub struct MenuSystem;
 impl System for MenuSystem {
     fn start(&mut self, state: &mut game::State) {
         state.player1.score = 0;
-        state.player2.score = 0;
+
         state.player1.position.y = 0.0;
-        state.player2.position.y = 0.0;
+
         state.menu.play_button.focused = true;
         state.menu.quit_button.focused = false;
     }
@@ -98,13 +96,9 @@ impl System for GameOverSystem {
         self.last_time = instant::Instant::now();
 
         state.player1_score.text = format!("{}", state.player1.score);
-        state.player2_score.text = format!("{}", state.player2.score);
 
-        state.menu.win_text.text = if state.player1.score > state.player2.score {
-            String::from("Player 1 wins!")
-        } else {
-            String::from("Player 2 wins!")
-        };
+        state.menu.win_text.text =
+            String::from("You win!");
 
         log::info!("{}", state.menu.win_text.text);
     }

@@ -151,7 +151,7 @@ impl Render {
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
 
-        let num_indices = if state.player1.visible || state.player2.visible {
+        let num_indices = if state.player1.visible {
             let (stg_vertex, stg_index, num_indices) =
                 state.draw(&mut self.glyph_brush).build(&self.device);
 
