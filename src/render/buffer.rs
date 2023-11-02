@@ -107,6 +107,45 @@ impl QuadBufferBuilder {
         ]);
         self
     }
+    pub fn push_elipse(
+        mut self,
+        center: cgmath::Vector2<f32>,
+        size: cgmath::Vector2<f32>,
+        color: Color,
+    ) -> Self {
+        let divisions = (512 * size.x.max(size.y) as usize).min(128).max(16);
+        let mut last_vertex = Vertex {
+            position: (center.x + size.x * 0.5, center.y, 0.0, 1.0).into(),
+            color,
+        };
+
+        for i in 0..divisions {
+            let angle = 2.0 * std::f32::consts::PI * (i + 1) as f32 / divisions as f32;
+            let vertex = Vertex {
+                position: (
+                    center.x + size.x * 0.5 * f32::cos(angle),
+                    center.y + size.y * 0.5 * f32::sin(angle),
+                    0.0,
+                    1.0,
+                )
+                    .into(),
+                color,
+            };
+            self.vertex_data.extend(&[
+                Vertex {
+                    position: (center.x, center.y, 0.0, 1.0).into(),
+                    color,
+                },
+                last_vertex,
+                vertex,
+            ]);
+            let vertex_len = self.vertex_data.len() as u32;
+            self.index_data
+                .extend(&[vertex_len - 3, vertex_len - 2, vertex_len - 1]);
+            last_vertex = vertex;
+        }
+        self
+    }
 
     pub fn push_tri2d(
         mut self,

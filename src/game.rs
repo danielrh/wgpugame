@@ -49,7 +49,7 @@ impl State {
 
         
         QuadBufferBuilder::new()
-            .push_quad2d(
+            .push_elipse(
                 self.player1.position,
                 self.player1.size,
                 Color::new(255, 255, 0),
@@ -58,7 +58,7 @@ impl State {
     }
 
     pub fn resize(&mut self, width: f32, _height: f32) {
-        self.player1_score.position = (width * 0.25, 20.0).into();
+        self.player1_score.position = (width * 0.5, 20.0).into();
     }
 }
 
@@ -74,6 +74,7 @@ pub struct Player {
 
 pub struct PlaySystem;
 impl System for PlaySystem {
+    #[allow(unused_variables)]
     fn update_state(
         &self,
         input: &crate::input::Input,

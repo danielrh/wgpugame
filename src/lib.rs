@@ -18,6 +18,7 @@ use xset::Xset;
 use winit::dpi::PhysicalSize;
 use winit::event::*;
 use winit::event_loop::{ControlFlow, EventLoop};
+#[allow(unused_imports)]
 use winit::window::{Fullscreen, WindowBuilder};
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
@@ -115,10 +116,7 @@ pub fn start() {
                 input.mouse_move_y = y;
             }
             Event::WindowEvent {
-                event:
-                    WindowEvent::CursorMoved {
-                        position: position, ..
-                    },
+                event: WindowEvent::CursorMoved { position, .. },
                 ..
             } => {
                 input.mouse_x = position.x;
@@ -134,12 +132,12 @@ pub fn start() {
                 event:
                     WindowEvent::MouseInput {
                         state: element_state,
-                        button: button,
+                        button,
                         ..
                     },
                 ..
             } => {
-                let mut index: usize;
+                let index: usize;
                 match button {
                     MouseButton::Left => {
                         index = 0;

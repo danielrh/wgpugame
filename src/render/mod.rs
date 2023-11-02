@@ -1,15 +1,18 @@
 mod buffer;
-
+mod camera;
 use std::iter;
 
+use buffer::*;
+pub use buffer::{Color, QuadBufferBuilder};
+use camera::CameraUniform;
+use wgpu::util::DeviceExt;
 use wgpu_glyph::{ab_glyph, Section, Text};
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
 
-use buffer::*;
-pub use buffer::{Color, QuadBufferBuilder};
-
 use crate::state;
+const MAX_VERTICES: u64 = 1024 * 1024;
+const MAX_INDICES: u64 = 2048 * 1024;
 
 const FONT_BYTES: &[u8] = include_bytes!("../../res/fonts/PressStart2P-Regular.ttf");
 
@@ -25,6 +28,9 @@ pub struct Render {
     index_buffer: wgpu::Buffer,
     glyph_brush: wgpu_glyph::GlyphBrush<()>,
     staging_belt: wgpu::util::StagingBelt,
+    camera_uniform: CameraUniform,
+    camera_uniform_buffer: wgpu::Buffer,
+    camera_bind_group: wgpu::BindGroup,
 }
 
 impl Render {
@@ -92,9 +98,37 @@ impl Render {
             view_formats: vec![],
         };
         surface.configure(&device, &config);
+        let camera_uniform = CameraUniform::default();
+        let camera_uniform_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Camera Buffer"),
+            contents: bytemuck::cast_slice(&[camera_uniform]),
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+        });
+        let camera_bind_group_layout =
+            device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+                entries: &[wgpu::BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: wgpu::ShaderStages::VERTEX,
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Uniform,
+                        has_dynamic_offset: false,
+                        min_binding_size: None,
+                    },
+                    count: None,
+                }],
+                label: Some("camera_bind_group_layout"),
+            });
+        let camera_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &camera_bind_group_layout,
+            entries: &[wgpu::BindGroupEntry {
+                binding: 0,
+                resource: camera_uniform_buffer.as_entire_binding(),
+            }],
+            label: Some("camera_bind_group"),
+        });
 
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-            bind_group_layouts: &[],
+            bind_group_layouts: &[&camera_bind_group_layout],
             push_constant_ranges: &[],
             label: Some("Pipeline Layout"),
         });
@@ -109,14 +143,14 @@ impl Render {
 
         let vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             label: None,
-            size: Vertex::SIZE * 4 * 3,
+            size: Vertex::SIZE * MAX_VERTICES * 3,
             usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
 
         let index_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             label: None,
-            size: U32_SIZE * 6 * 3,
+            size: U32_SIZE * MAX_INDICES * 3,
             usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
@@ -137,6 +171,9 @@ impl Render {
             index_buffer,
             glyph_brush,
             staging_belt,
+            camera_uniform,
+            camera_uniform_buffer,
+            camera_bind_group,
         }
     }
 
@@ -164,6 +201,14 @@ impl Render {
 
         match self.surface.get_current_texture() {
             Ok(frame) => {
+                self.camera_uniform
+                    .update_view_proj(self.width(), self.height());
+                self.queue.write_buffer(
+                    &self.camera_uniform_buffer,
+                    0,
+                    bytemuck::cast_slice(&[self.camera_uniform]),
+                );
+
                 let view = frame.texture.create_view(&Default::default());
                 let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                     label: Some("Main Render Pass"),
@@ -176,10 +221,11 @@ impl Render {
                 });
 
                 if num_indices != 0 {
+                    render_pass.set_pipeline(&self.pipeline);
                     render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
                     render_pass
                         .set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint32);
-                    render_pass.set_pipeline(&self.pipeline);
+                    render_pass.set_bind_group(0, &self.camera_bind_group, &[]);
                     render_pass.draw_indexed(0..num_indices, 0, 0..1);
                 }
 
