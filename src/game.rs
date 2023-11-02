@@ -38,7 +38,7 @@ impl State {
                 visible: true,
             },
             player1_score: Text {
-                position: (render.width() * 0.25, 20.0).into(),
+                position: (render.width() * 0.5, 20.0).into(),
                 color: Color::new(255, 255, 0),
                 text: String::from("0"),
                 size: 32.0,
@@ -76,7 +76,7 @@ impl State {
     }
 
     pub fn resize(&mut self, width: f32, _height: f32) {
-        self.player1_score.position = (width * 0.25, 20.0).into();
+        self.player1_score.position = (width * 0.5, 20.0).into();
         self.player2_score.position = (width * 0.75, 20.0).into()
     }
 }
