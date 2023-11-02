@@ -2,17 +2,17 @@ mod buffer;
 mod camera;
 use std::iter;
 
-use wgpu_glyph::{ab_glyph, Section, Text};
-use wgpu::util::DeviceExt;
-use winit::dpi::PhysicalSize;
-use winit::window::Window;
-use camera::CameraUniform;
 use buffer::*;
 pub use buffer::{Color, QuadBufferBuilder};
+use camera::CameraUniform;
+use wgpu::util::DeviceExt;
+use wgpu_glyph::{ab_glyph, Section, Text};
+use winit::dpi::PhysicalSize;
+use winit::window::Window;
 
 use crate::state;
-const MAX_VERTICES :u64 = 1024 * 1024;
-const MAX_INDICES :u64 = 2048 * 1024;
+const MAX_VERTICES: u64 = 1024 * 1024;
+const MAX_INDICES: u64 = 2048 * 1024;
 
 const FONT_BYTES: &[u8] = include_bytes!("../../res/fonts/PressStart2P-Regular.ttf");
 
@@ -99,15 +99,14 @@ impl Render {
         };
         surface.configure(&device, &config);
         let camera_uniform = CameraUniform::default();
-        let camera_uniform_buffer = device.create_buffer_init(
-            &wgpu::util::BufferInitDescriptor {
-                label: Some("Camera Buffer"),
-                contents: bytemuck::cast_slice(&[camera_uniform]),
-                usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
-            });
-        let camera_bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-            entries: &[
-                wgpu::BindGroupLayoutEntry {
+        let camera_uniform_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Camera Buffer"),
+            contents: bytemuck::cast_slice(&[camera_uniform]),
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+        });
+        let camera_bind_group_layout =
+            device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+                entries: &[wgpu::BindGroupLayoutEntry {
                     binding: 0,
                     visibility: wgpu::ShaderStages::VERTEX,
                     ty: wgpu::BindingType::Buffer {
@@ -116,25 +115,20 @@ impl Render {
                         min_binding_size: None,
                     },
                     count: None,
-                }
-            ],
-            label: Some("camera_bind_group_layout"),
-        });
+                }],
+                label: Some("camera_bind_group_layout"),
+            });
         let camera_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &camera_bind_group_layout,
-            entries: &[
-                wgpu::BindGroupEntry {
-                    binding: 0,
-                    resource: camera_uniform_buffer.as_entire_binding(),
-                }
-            ],
+            entries: &[wgpu::BindGroupEntry {
+                binding: 0,
+                resource: camera_uniform_buffer.as_entire_binding(),
+            }],
             label: Some("camera_bind_group"),
         });
 
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-            bind_group_layouts: &[
-                &camera_bind_group_layout,
-            ],
+            bind_group_layouts: &[&camera_bind_group_layout],
             push_constant_ranges: &[],
             label: Some("Pipeline Layout"),
         });
@@ -207,13 +201,14 @@ impl Render {
 
         match self.surface.get_current_texture() {
             Ok(frame) => {
-                self.camera_uniform.update_view_proj(self.width(), self.height());
+                self.camera_uniform
+                    .update_view_proj(self.width(), self.height());
                 self.queue.write_buffer(
                     &self.camera_uniform_buffer,
                     0,
                     bytemuck::cast_slice(&[self.camera_uniform]),
                 );
-                    
+
                 let view = frame.texture.create_view(&Default::default());
                 let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                     label: Some("Main Render Pass"),

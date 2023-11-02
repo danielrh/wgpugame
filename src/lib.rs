@@ -116,10 +116,7 @@ pub fn start() {
                 input.mouse_move_y = y;
             }
             Event::WindowEvent {
-                event:
-                    WindowEvent::CursorMoved {
-                        position, ..
-                    },
+                event: WindowEvent::CursorMoved { position, .. },
                 ..
             } => {
                 input.mouse_x = position.x;

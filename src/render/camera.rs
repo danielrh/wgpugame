@@ -21,4 +21,3 @@ impl CameraUniform {
         eprintln!("View Proj {:?}", self.view_proj);
     }
 }
- 
