@@ -18,6 +18,5 @@ impl Default for CameraUniform {
 impl CameraUniform {
     pub fn update_view_proj(&mut self, width: f32, height: f32) {
         self.view_proj[0][0] = height / width.max(1.0);
-        eprintln!("View Proj {:?}", self.view_proj);
     }
 }
