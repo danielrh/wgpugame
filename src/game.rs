@@ -49,7 +49,7 @@ impl State {
 
         
         QuadBufferBuilder::new()
-            .push_elipse(
+            .push_quad2d(
                 self.player1.position,
                 self.player1.size,
                 Color::new(255, 255, 0),
