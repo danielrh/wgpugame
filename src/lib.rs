@@ -50,7 +50,7 @@ pub fn start() {
         window.set_inner_size(PhysicalSize::new(512, 512));
     }
 
-    window.set_cursor_visible(false);
+    window.set_cursor_visible(true);
 
     #[cfg(target_arch = "wasm32")]
     {
