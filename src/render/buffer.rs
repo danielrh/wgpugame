@@ -107,13 +107,13 @@ impl QuadBufferBuilder {
         ]);
         self
     }
-    pub fn push_elipse(
+    pub fn push_circle2d(
         mut self,
         center: cgmath::Vector2<f32>,
         size: cgmath::Vector2<f32>,
         color: Color,
     ) -> Self {
-        let divisions = (512 * size.x.max(size.y) as usize).min(128).max(16);
+        let divisions = (1024 * size.x.max(size.y) as usize).min(256).max(64);
         let mut last_vertex = Vertex {
             position: (center.x + size.x * 0.5, center.y, 0.0, 1.0).into(),
             color,

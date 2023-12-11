@@ -1,3 +1,5 @@
+use cgmath::Vector2;
+
 use super::menu::Menu;
 use super::render::Render;
 use super::state::Text;
@@ -48,14 +50,21 @@ impl State {
         }
 
         
-        QuadBufferBuilder::new()
-            .push_quad2d(
+        let mut circles = QuadBufferBuilder::new()
+            .push_circle2d(
                 self.player1.position,
                 self.player1.size,
-                Color::new(255, 255, 0),
-            )
-            
+                Color::new(255, 100, 0),
+            );
+      //      .push_circle2d(self.player1.position-Vector2{x:0.1,y:0.0},self.player1.size/4.00, Color::new(255, 25, 0));
+
+            for i in 0..6 {
+                let angle = i as f32*2.0*std::f32::consts::PI/6.0;
+                let radius= 0.1;
+                circles = circles.push_circle2d(self.player1.position-Vector2{x: radius*angle.cos(),y:radius*angle.sin() },self.player1.size/4.00,Color::new(255, 25, 0));
     }
+            circles
+        }
 
     pub fn resize(&mut self, width: f32, _height: f32) {
         self.player1_score.position = (width * 0.5, 20.0).into();
@@ -82,7 +91,7 @@ impl System for PlaySystem {
         _events: &mut Vec<crate::state::Event>,
     ) {
 
-
+        
         // Copy current score to players
         state.player1_score.text = state.player1.score.to_string();
 
